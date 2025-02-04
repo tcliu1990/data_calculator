@@ -1,20 +1,65 @@
-heroes_list = ['abaddon', 'alchemist', 'ancient apparition', 'anti-mage', 'arc warden', 'axe', 'bane', 'batrider',
-               'beastmaster', 'bloodseeker', 'bounty hunter', 'brewmaster', 'bristleback', 'broodmother',
-               'centaur warrunner', 'chaos knight', 'chen', 'clinkz', 'clockwerk', 'crystal maiden', 'dark seer',
-               'dark willow', 'dawnbreaker', 'dazzle', 'death prophet', 'disruptor', 'doom', 'dragon knight',
-               'drow ranger', 'earth spirit', 'earthshaker', 'elder titan', 'ember spirit', 'enchantress', 'enigma',
-               'faceless void', 'grimstroke', 'gyrocopter', 'hoodwink', 'huskar', 'invoker', 'io', 'jakiro',
-               'juggernaut', 'keeper of the light', 'kez','kunkka', 'legion commander', 'leshrac', 'lich', 'lifestealer',
-               'lina', 'lion', 'lone druid', 'luna', 'lycan', 'magnus', 'marci', 'mars', 'medusa', 'muerta', 'meepo', 'mirana',
-               'monkey king', 'morphling', 'naga siren', "nature's prophet", 'necrophos', 'night stalker',
-               'nyx assassin', 'ogre magi', 'omniknight', 'oracle', 'outworld destroyer', 'pangolier',
-               'phantom assassin', 'phantom lancer', 'phoenix', 'primal beast', 'puck', 'pudge', 'pugna', 'queen of pain', 'razor',
-               'riki', 'ringmaster', 'rubick', 'sand king', 'shadow demon', 'shadow fiend', 'shadow shaman', 'silencer',
-               'skywrath mage', 'slardar', 'slark', 'snapfire', 'sniper', 'spectre', 'spirit breaker', 'storm spirit',
-               'sven', 'techies', 'templar assassin', 'terrorblade', 'tidehunter', 'timbersaw', 'tinker', 'tiny',
-               'treant protector', 'troll warlord', 'tusk', 'underlord', 'undying', 'ursa', 'vengeful spirit',
-               'venomancer', 'viper', 'visage', 'void spirit', 'warlock', 'weaver', 'windranger', 'winter wyvern',
-               'witch doctor', 'wraith king', 'zeus']
+heroes = [
+    'abaddon', 'alchemist', 'ancient apparition', 'anti-mage', 'arc warden',
+    'axe', 
+
+    'bane', 'batrider', 'beastmaster', 'bloodseeker', 'bounty hunter',
+    'brewmaster', 'bristleback', 'broodmother',
+
+    'centaur warrunner', 'chaos knight', 'chen', 'clinkz', 'clockwerk',
+    'crystal maiden',
+
+    'dark seer', 'dark willow', 'dawnbreaker', 'dazzle', 'death prophet',
+    'disruptor', 'doom', 'dragon knight', 'drow ranger',
+
+    'earth spirit', 'earthshaker', 'elder titan', 'ember spirit', 'enchantress',
+    'enigma',
+
+    'faceless void',
+
+    'grimstroke', 'gyrocopter',
+
+    'hoodwink', 'huskar',
+
+    'invoker', 'io',
+
+    'jakiro', 'juggernaut',
+
+    'keeper of the light', 'kez', 'kunkka',
+
+    'legion commander', 'leshrac', 'lich', 'lifestealer', 'lina',
+    'lion', 'lone druid', 'luna', 'lycan',
+
+    'magnus', 'marci', 'mars', 'medusa', 'meepo',
+    'mirana', 'monkey king', 'morphling', 'muerta',
+
+    'naga siren', "nature's prophet", 'necrophos', 'night stalker', 'nyx assassin',
+
+    'ogre magi', 'omniknight', 'oracle', 'outworld destroyer',
+
+    'pangolier', 'phantom assassin', 'phantom lancer', 'phoenix', 'primal beast',
+    'puck', 'pudge', 'pugna',
+
+    'queen of pain',
+
+    'razor', 'riki', 'ringmaster', 'rubick',
+
+    'sand king', 'shadow demon', 'shadow fiend', 'shadow shaman', 'silencer',
+    'skywrath mage', 'slardar', 'slark', 'snapfire', 'sniper',
+    'spectre', 'spirit breaker', 'storm spirit', 'sven',
+
+    'techies', 'templar assassin', 'terrorblade', 'tidehunter', 'timbersaw',
+    'tinker', 'tiny', 'treant protector', 'troll warlord', 'tusk',
+
+    'underlord', 'undying', 'ursa',
+
+    'vengeful spirit', 'venomancer', 'viper', 'visage', 'void spirit',
+
+    'warlock', 'weaver', 'windranger', 'winter wyvern', 'witch doctor',
+    'wraith king',
+
+    'zeus'
+]
+
 
 mid_list = ['batrider', 'bloodseeker', 'bounty hunter', 'bristleback', 'broodmother', 'dawnbreaker', 'death prophet', 'dragon knight',
             'ember spirit', 'enchantress', 'huskar', 'invoker', 'kunkka', 'legion commander', 'leshrac', 'lina', "nature's prophet"
