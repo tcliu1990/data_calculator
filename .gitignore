@@ -3,6 +3,7 @@
 
 # Allow Python files
 !*.py
+!disadvantage.csv
 
 # Ensure Git tracks .gitignore itself
 !.gitignore
