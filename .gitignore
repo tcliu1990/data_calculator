@@ -1,0 +1,8 @@
+# Ignore everything
+*
+
+# Allow Python files
+!*.py
+
+# Ensure Git tracks .gitignore itself
+!.gitignore
