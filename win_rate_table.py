@@ -1,32 +1,110 @@
-import csv
-import requests
-from heores_list import normalize_hero_name, heroes_list
-from bs4 import BeautifulSoup
 from time import sleep
+from heores_list import normalize_hero_name, win_replay_finder_list, mid_replay_finder_list, spirit_list
+from bs4 import BeautifulSoup
+import sqlite3
+from datetime import datetime, timedelta
+from gql import gql, Client
+from gql.transport.requests import RequestsHTTPTransport
+import json
+from hero_list import HERO_ID_MAP, ID_HERO_MAP
 
-headers = {
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Safari/537.36'}
-cookie_string = {
-    'cookie': '_tz=America/Toronto; _ga=GA1.2.1325744723.1637551614; __qca=P0-419533972-1637551614996; _hjSessionUser_2490228=eyJpZCI6ImJjYTlhNTg0LWUyZWItNTU0ZC1iZmZjLTA2MzJlMzc0MmMyMSIsImNyZWF0ZWQiOjE2Mzc1NTE2MTQ4MjgsImV4aXN0aW5nIjp0cnVlfQ==; __gads=ID=d23bb385aad022c0:T=1637551619:S=ALNI_MZe6MnHgAdv2IBZ7VXb5neg8ZhUxw; _ats=1639678200; __aaxsc=1; _gid=GA1.2.43480603.1641147794; _hjSession_2490228=eyJpZCI6ImEyMTBkODY3LTJmNTUtNDhkYi04ODgwLTM4NGE2MDIzZWZiYiIsImNyZWF0ZWQiOjE2NDE0Nzk3Mzk1MDl9; _hjIncludedInSessionSample=0; _hjAbsoluteSessionInProgress=0; _hi=1641479767183; aasd=4|1641479739861; FCNEC=[["AKsRol9RR6bm4MZMrd2pKEiSwEBMaDB3DyFENMemdC0Im8oluLWFkUseGKQ6VJQPzDccGBMqyx42M7aWcYw9g5P9mH0MXpg9Mot3vigysvt36mPeiiRN2gPIQtrVWD7Zjz1TQWyd2768v-CkUqz3jH9kAsWoM6YtNQ=="],null,[]]'}
+from counter_table import headers, cookie_string
+import ctypes
 
-with open('win_rate_table.csv', 'w', newline='') as win_rate_table:
-    disadvantage_writer = csv.writer(win_rate_table, delimiter=' ')
-    disadvantage_writer.writerow(['', ] + heroes_list)
-    for hero in heroes_list:
-        normalize_name = normalize_hero_name(hero)
-        r = requests.get('https://www.dotabuff.com/heroes/{}/counters'.format(normalize_name), cookies=cookie_string,
-                         headers=headers)
-        sleep(2)
-        if r.status_code == 200:
-            soup = BeautifulSoup(r.text, 'html.parser')
-            rows = soup.find_all('table')[3].find_all('tr')
+# 防止系统休眠 + 屏幕关闭
+ES_CONTINUOUS = 0x80000000
+ES_SYSTEM_REQUIRED = 0x00000001
+ES_DISPLAY_REQUIRED = 0x00000002
+
+from time import sleep
+from heores_list import normalize_hero_name, win_replay_finder_list, mid_replay_finder_list, spirit_list
+from bs4 import BeautifulSoup
+import sqlite3
+from datetime import datetime, timedelta
+from gql import gql, Client
+from gql.transport.requests import RequestsHTTPTransport
+import json
+from hero_list import HERO_ID_MAP
+import csv
+from heores_list import heroes_list
+
+from counter_table import headers, cookie_string
+import ctypes
+
+# 防止系统休眠 + 屏幕关闭
+ES_CONTINUOUS = 0x80000000
+ES_SYSTEM_REQUIRED = 0x00000001
+ES_DISPLAY_REQUIRED = 0x00000002
+
+
+headers = {"Authorization": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJTdWJqZWN0IjoiOTcxMTM5YTctNzQxZi00NDA2LTg1OGMtMzM0MTYwNmM3NGJkIiwiU3RlYW1JZCI6IjE3MzY5NDc5NyIsIkFQSVVzZXIiOiJ0cnVlIiwibmJmIjoxNzYwNjE2NTgyLCJleHAiOjE3OTIxNTI1ODIsImlhdCI6MTc2MDYxNjU4MiwiaXNzIjoiaHR0cHM6Ly9hcGkuc3RyYXR6LmNvbSJ9.F2V_4jcZgUiCkVaTcJdhXqCAc-XF36wiMY-De50s7Qc",
+           'Content-Type': 'application/json',
+           "User-Agent": "STRATZ_API",  # try replacing STRATZ_API with a browser UA,
+           "Accept": "*",
+           }
+transport = RequestsHTTPTransport(
+    url="https://api.stratz.com/graphql",
+    headers=headers,
+    verify=True,
+    retries=3,
+)
+client = Client(transport=transport, fetch_schema_from_transport=False)
+
+def deep_get(d, path, default=None):
+    for key in path:
+        if isinstance(d, dict):
+            d = d.get(key)
+        elif isinstance(d, list) and isinstance(key, int):
+            if len(d) > key:
+                d = d[key]
+            else:
+                return default
+        else:
+            return default
+    return d
+
+
+match_up_query = gql("""
+    query ($heroId: Short!, $take:Int! ) {
+        heroStats {
+            matchUp(heroId: $heroId, take:$take){
+                vs {
+                    heroId2
+                    synergy
+            }      
+            }         
+        }
+    }
+    """)
+
+def get_match_up(hero,):
+    """Query guide matches for a specific hero vs opponent."""
+    guide_result = client.execute(
+        match_up_query,
+        variable_values={
+            "heroId": HERO_ID_MAP[hero],
+            'take': 150
+        }
+    )
+    sleep(1)
+    return deep_get(guide_result, ['heroStats', 'matchUp', 0, 'vs'])
+
+
+def run():
+    with open('win_rate_table.csv', 'w', newline='') as win_rate_table:
+        disadvantage_writer = csv.writer(win_rate_table, delimiter=',')
+        disadvantage_writer.writerow(['', ] + heroes_list)
+        for hero in heroes_list:
+            results = get_match_up(hero)
             winrate_res = [hero] + [0] * len(heroes_list)
-            for row in rows[1:]:
-                name = row.find_all('td')[0]['data-value'].lower()
-                index = heroes_list.index(name) + 1
-                winrate_res[index] = row.find_all('td')[3]['data-value']
-            # winrate_writer.writerow(winrate_res)
+            for res in results:
+                index = heroes_list.index(ID_HERO_MAP[res['heroId2']]) + 1
+                winrate_res[index] = res['synergy']
+
             disadvantage_writer.writerow(winrate_res)
             print('finish ' + hero)
-        else:
-            print('unfinish ' + hero)
+
+
+if __name__=='__main__':
+    run()
+                
