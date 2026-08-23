@@ -3,6 +3,18 @@ from heores_list import heroes_list, mid_list, heroes_dict
 from pprint import pprint
 
 
+def normalize_input_hero(hero):
+    return heroes_dict.get(hero, hero)
+
+
+def load_matchup_table(path, delimiter):
+    with open(path, 'r', encoding='utf-8') as matchup_file:
+        reader = csv.reader(matchup_file, delimiter=delimiter)
+        header = next(reader)
+        rows = {row[0]: row for row in reader if row}
+    return header, rows
+
+
 def disadvantage_calculate(opp_heroes, my_heroes):
     with open('disadvantage.csv', 'r', encoding='utf-8') as disadvantage_file:
         reader = csv.reader(disadvantage_file, delimiter=' ')
@@ -60,30 +72,34 @@ def disadvantage_calculate2(opp_heroes, my_heroes):
 
 
 def disadvantage_calculate3(opp_heroes):
-    with open('win_rate_table.csv', 'r', encoding='utf-8') as disadvantage_file:
-        reader = csv.reader(disadvantage_file, delimiter=',')
-        next(reader, None)
-        my_res = {}
-        opp_res = {}
+    header, rows_by_hero = load_matchup_table('disadvantage.csv', ' ')
+    my_res = {}
 
-        for row in reader:
-            disadvantage_list = []
-            my_res[row[0]] = 0
-            opp_res[row[0]] = 0
-            for hero in opp_heroes:
-                if not hero:
-                    continue
-                hero = heroes_dict[hero]
-                index = heroes_list.index(hero) + 1
-                disadvantage = float(row[index])
-                disadvantage_list.append({hero: disadvantage})
-                my_res[row[0]] += disadvantage
-            my_res[row[0]] = [my_res[row[0]], disadvantage_list]
-        without_mid = {k: v for k, v in sorted(my_res.items(), key=lambda item: item[1][0], reverse=True) if v[0] > 0}
+    for candidate in rows_by_hero:
+        disadvantage_list = []
+        my_res[candidate] = 0
+
+        for hero in opp_heroes:
+            if not hero:
+                continue
+
+            opp_hero = normalize_input_hero(hero)
+            if opp_hero not in rows_by_hero or candidate not in header:
+                continue
+
+            # Dotabuff's table is directional. For "candidate counters opponent",
+            # read the opponent row at the candidate column.
+            disadvantage = float(rows_by_hero[opp_hero][header.index(candidate)])
+            disadvantage_list.append({opp_hero: disadvantage})
+            my_res[candidate] += disadvantage
+
+        my_res[candidate] = [my_res[candidate], disadvantage_list]
+
+    without_mid = {k: v for k, v in sorted(my_res.items(), key=lambda item: item[1][0], reverse=True) if v[0] > 0}
 
     return without_mid,
 
-a = ["幽鬼", "军团", "火枪", "骨法", '']
+a = ["巫医", "尸王", "大锤", "力丸", '']
 
 import json
 # with open('result.json', 'w', encoding='utf-8') as f:
