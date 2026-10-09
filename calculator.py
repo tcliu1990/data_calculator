@@ -15,6 +15,16 @@ def load_matchup_table(path, delimiter):
     return header, rows
 
 
+def get_matchup_value(rows_by_hero, header, opponent, candidate):
+    if opponent in rows_by_hero:
+        return float(rows_by_hero[opponent][header.index(candidate)])
+
+    if opponent in header and candidate in rows_by_hero:
+        return -float(rows_by_hero[candidate][header.index(opponent)])
+
+    return None
+
+
 def disadvantage_calculate(opp_heroes, my_heroes):
     with open('disadvantage.csv', 'r', encoding='utf-8') as disadvantage_file:
         reader = csv.reader(disadvantage_file, delimiter=' ')
@@ -75,7 +85,10 @@ def disadvantage_calculate3(opp_heroes):
     header, rows_by_hero = load_matchup_table('disadvantage.csv', ' ')
     my_res = {}
 
-    for candidate in rows_by_hero:
+    for candidate in header:
+        if not candidate:
+            continue
+
         disadvantage_list = []
         my_res[candidate] = 0
 
@@ -84,12 +97,15 @@ def disadvantage_calculate3(opp_heroes):
                 continue
 
             opp_hero = normalize_input_hero(hero)
-            if opp_hero not in rows_by_hero or candidate not in header:
+            if candidate not in header:
                 continue
 
             # Dotabuff's table is directional. For "candidate counters opponent",
             # read the opponent row at the candidate column.
-            disadvantage = float(rows_by_hero[opp_hero][header.index(candidate)])
+            disadvantage = get_matchup_value(rows_by_hero, header, opp_hero, candidate)
+            if disadvantage is None:
+                continue
+
             disadvantage_list.append({opp_hero: disadvantage})
             my_res[candidate] += disadvantage
 
@@ -99,7 +115,7 @@ def disadvantage_calculate3(opp_heroes):
 
     return without_mid,
 
-a = ["巫医", "尸王", "大锤", "力丸", '']
+a = ["蓝胖", "术士", "血魔", "潮汐", '']
 
 import json
 # with open('result.json', 'w', encoding='utf-8') as f:
